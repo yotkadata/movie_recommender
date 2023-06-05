@@ -5,8 +5,6 @@ A movie recommender app built with streamlit.
 import numpy as np
 import pandas as pd
 import streamlit as st
-from imdb import Cinemagoer
-from imdb.helpers import resizeImage
 
 from recommender import Recommender
 
@@ -16,7 +14,8 @@ def load_movies():
     """
     Function to load prepared data from CSV files.
     """
-    movies = pd.read_csv("./data/movies_prepared.csv")
+    # movies = pd.read_csv("./data/movies_prepared.csv")
+    movies = pd.read_csv("./data/movies_imdb.csv")
     return movies
 
 
@@ -27,7 +26,7 @@ def get_random_movies_to_rate(num_movies=5):
     """
     movies = load_movies()
 
-    movies = movies.sort_values("rating", ascending=False).reset_index(drop=True)
+    movies = movies.sort_values("imdb_rating", ascending=False).reset_index(drop=True)
     movies = movies[:100]
 
     select = np.random.choice(movies.index, size=num_movies, replace=False)
@@ -36,14 +35,11 @@ def get_random_movies_to_rate(num_movies=5):
 
 
 @st.cache_data
-def get_movies(num_movies=5):
+def get_movies():
     """
     Function to get movie titles and ids to be selected by the user.
     """
     movies = load_movies()
-    if num_movies == "all":
-        num_movies = len(movies)
-
     movies = movies.sort_values("title").reset_index(drop=True)
 
     return movies
@@ -64,7 +60,7 @@ def prepare_query_favourites():
     """
     Function to prepare query to search for movies based on favourite movies.
     """
-    data = get_movies("all")
+    data = get_movies()
 
     st.markdown(
         "Don't know which movie to watch tonight?"
@@ -95,7 +91,8 @@ def prepare_query_rating():
 
     st.markdown(
         "Don't know which movie to watch tonight? Here are 10 randomly chosen movies."
-        "Just **rate as many of them as you like** and based on your rating we'll recommend you something you might like."
+        "Just **rate as many of them as you like** and based on your rating "
+        "we'll recommend you something you might like."
     )
 
     query = {}
@@ -122,14 +119,14 @@ def recommender(rec_type="fav"):
         key="method_selector_" + rec_type,
     )
 
-    # Translate selection into keaywords
+    # Translate selection into keywords
     method = "neighbors" if method_select == "Nearest Neighbors" else "nmf"
 
     num_movies = st.slider(
         "How many movies should we recommend?",
         min_value=1,
         max_value=10,
-        value=3,
+        value=5,
         key="num_movies_slider_" + rec_type,
     )
 
@@ -137,37 +134,44 @@ def recommender(rec_type="fav"):
     if st.button("Recommend some movies!", key="button_" + rec_type):
         with st.spinner(f"Calculating recommendations using {method_select}..."):
             recommend = Recommender(query, method=method, k=num_movies)
-            _, titles = recommend.recommend()
+            movie_ids, _ = recommend.recommend()
 
         with st.spinner("Fetching movie information from IMDB..."):
             st.write("Recommended movies using Nearest Neighbors:\n")
-            for title in titles:
-                imdb = Cinemagoer()
-                imdb_movies = imdb.search_movie(title)
-                imdb_movie = imdb.get_movie(imdb_movies[0].movieID)
-                display_movie(imdb_movie)
+            for movie_id in movie_ids:
+                display_movie(movie_id)
 
 
-def display_movie(movie):
+def display_movie(movie_id):
     """
     Function that displays a movie with information from IMDB.
     """
-    directors = [director["name"] for director in movie["director"]]
-    cast = [actor["name"] for actor in movie["cast"]]
-    img_url = resizeImage(movie["full-size cover url"], width=200)
+    movies = load_movies()
+    movie = movies[movies["movie_id"] == movie_id].copy()
 
     col1, col2 = st.columns([1, 4])
 
     with col1:
-        st.image(img_url)
+        if "cover_url" in movie.columns:
+            st.image(movie["cover_url"].iloc[0])
 
     with col2:
-        st.header(f"{movie['title']} ({movie['year']})")
-        st.markdown(f"**IMDB-rating:** {movie['rating']}/10")
-        st.markdown(f"**Genres:** {', '.join(movie['genres'])}")
-        st.markdown(f"**Director(s):** {', '.join(directors)}")
-        st.markdown(f"**Cast:** {', '.join(cast[:10])}, ...")
-        st.markdown(f"{movie['plot outline']}")
+        if "title" in movie.columns and "year" in movie.columns:
+            st.header(f"{movie['title'].iloc[0]} ({movie['year'].iloc[0]})")
+        if "imdb_rating" in movie.columns:
+            st.markdown(f"**IMDB-rating:** {movie['imdb_rating'].iloc[0]}/10")
+        if "genre" in movie.columns:
+            st.markdown(f"**Genres:** {', '.join(movie['genre'].iloc[0].split(' | '))}")
+        if "director" in movie.columns:
+            st.markdown(
+                f"**Director(s):** {', '.join(movie['director'].iloc[0].split('|'))}"
+            )
+        if "cast" in movie.columns:
+            st.markdown(
+                f"**Cast:** {', '.join(movie['cast'].iloc[0].split('|')[:10])}, ..."
+            )
+        if "plot" in movie.columns:
+            st.markdown(f"{movie['plot'].iloc[0]}")
     st.divider()
 
 
