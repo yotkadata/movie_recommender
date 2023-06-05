@@ -3,6 +3,7 @@ Fetch movie information from IMDB
 """
 
 import time
+from pathlib import Path
 
 import pandas as pd
 from imdb import Cinemagoer
@@ -21,6 +22,11 @@ def fetch_from_imdb(movie_title):
     """
     Function to fetch information from IMDB
     """
+
+    # Fix some missing values manually
+    if movie_title == "Seven (a.k.a. Se7en) (1995)":
+        movie_title = "Se7en"
+
     imdb = Cinemagoer()
     imdb_movies = imdb.search_movie(movie_title)
     time.sleep(0.5)
@@ -45,7 +51,9 @@ def fetch_from_imdb(movie_title):
         for key, value in keys.items():
             try:
                 if key in ["director", "cast"]:
-                    metadata[value] = [content["name"] for content in imdb_movie[key]]
+                    metadata[value] = "|".join(
+                        [content["name"] for content in imdb_movie[key]]
+                    )
                 elif key == "full-size cover url":
                     metadata[value] = resizeImage(imdb_movie[key], width=200)
                 else:
@@ -73,33 +81,70 @@ def update_dataframe_row(df_row):
     return df_row
 
 
+def combine_batches():
+    """
+    Function to combine CSV batches.
+    """
+    # Get all CSV files from batch directory
+    batch_dir = Path("data/batches/")
+    csv_files = list(batch_dir.glob("*.csv"))
+
+    df_csv_concat = pd.concat(
+        [pd.read_csv(file, index_col=[0]) for file in csv_files], ignore_index=True
+    )
+
+    concat_file = "data/data_with_imdb.csv"
+    df_csv_concat.to_csv(concat_file)
+    print(f"Batches combined to {concat_file}.")
+
+    # Remove batch files
+    [file.unlink() for file in csv_files]
+    print("Batch files removed.")
+
+    return concat_file
+
+
 def main():
     """
     Main function
     """
     movies = load_movies()
 
-    # Limit number of movies for testing
-    imdb_movies = movies.iloc[:100]
-    imdb_movies = imdb_movies.apply(update_dataframe_row, axis=1)
+    batch_size = 50
+    total_num = len(movies)
 
-    file_name = "data/data_with_imdb.csv"
-    imdb_movies[
-        [
-            "movie_id",
-            "imdb_id",
-            "title",
-            "imdb_rating",
-            "year",
-            "genre",
-            "director",
-            "cast",
-            "cover_url",
-            "plot",
-        ]
-    ].to_csv(file_name)
+    splits = list(range(0, total_num, batch_size))
+    splits.append(total_num + 1)
 
-    print(f"File saved to {file_name}.")
+    batch_list = [(splits[i], splits[i + 1]) for i in range(len(splits) - 1)]
+
+    for batch in batch_list:
+        file_name = Path(f"data/batches/data_with_imdb_{batch[0]}-{batch[1]-1}.csv")
+
+        if not file_name.is_file():
+            df_new = movies.iloc[batch[0] : batch[1]].apply(
+                update_dataframe_row, axis=1
+            )
+
+            cols = [
+                "movie_id",
+                "imdb_id",
+                "title",
+                "imdb_rating",
+                "year",
+                "genre",
+                "director",
+                "cast",
+                "cover_url",
+                "plot",
+            ]
+            df_new[cols].to_csv(file_name)
+
+            print(f"Batch saved to {file_name}.")
+        else:
+            print(f"Batch {file_name.name} already exists, skipping.")
+
+    combine_batches()
 
 
 if __name__ == "__main__":
