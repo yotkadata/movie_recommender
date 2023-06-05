@@ -16,6 +16,9 @@ TDD (Test-driven-development)  cycle:
 3. repeat 0-->2
 
 """
+import sys
+
+sys.path.append("..")  # Import from parent directory
 from recommender import Recommender
 
 
