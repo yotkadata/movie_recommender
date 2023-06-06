@@ -15,7 +15,6 @@ def load_movies():
     """
     Function to load prepared data from CSV files.
     """
-    # movies = pd.read_csv("./data/movies_prepared.csv")
     movies = pd.read_csv("./data/movies_imdb.csv")
     return movies
 
@@ -157,21 +156,23 @@ def display_movie(movie_id):
             st.image(movie["cover_url"].iloc[0])
 
     with col2:
-        if "title" in movie.columns and "year" in movie.columns:
+        if not pd.isnull(movie["title"].iloc[0]) and not pd.isnull(
+            movie["year"].iloc[0]
+        ):
             st.header(f"{movie['title'].iloc[0]} ({movie['year'].iloc[0]})")
-        if "imdb_rating" in movie.columns:
+        if not pd.isnull(movie["imdb_rating"].iloc[0]):
             st.markdown(f"**IMDB-rating:** {movie['imdb_rating'].iloc[0]}/10")
-        if "genre" in movie.columns:
+        if not pd.isnull(movie["genre"].iloc[0]):
             st.markdown(f"**Genres:** {', '.join(movie['genre'].iloc[0].split(' | '))}")
-        if "director" in movie.columns:
+        if not pd.isnull(movie["director"].iloc[0]):
             st.markdown(
                 f"**Director(s):** {', '.join(movie['director'].iloc[0].split('|'))}"
             )
-        if "cast" in movie.columns:
+        if not pd.isnull(movie["cast"].iloc[0]):
             st.markdown(
                 f"**Cast:** {', '.join(movie['cast'].iloc[0].split('|')[:10])}, ..."
             )
-        if "plot" in movie.columns:
+        if not pd.isnull(movie["plot"].iloc[0]):
             st.markdown(f"{movie['plot'].iloc[0]}")
         if validators.url(str(movie["url"].iloc[0])):
             st.markdown(f"[Read more on imdb.com]({movie['url'].iloc[0]})")
