@@ -5,6 +5,7 @@ A movie recommender app built with streamlit.
 import numpy as np
 import pandas as pd
 import streamlit as st
+import validators
 
 from recommender import Recommender
 
@@ -152,7 +153,7 @@ def display_movie(movie_id):
     col1, col2 = st.columns([1, 4])
 
     with col1:
-        if "cover_url" in movie.columns:
+        if validators.url(str(movie["cover_url"].iloc[0])):
             st.image(movie["cover_url"].iloc[0])
 
     with col2:
@@ -172,11 +173,16 @@ def display_movie(movie_id):
             )
         if "plot" in movie.columns:
             st.markdown(f"{movie['plot'].iloc[0]}")
+        if validators.url(str(movie["url"].iloc[0])):
+            st.markdown(f"[Read more on imdb.com]({movie['url'].iloc[0]})")
     st.divider()
 
 
 # Set page title
 st.set_page_config(page_title="What should I watch tonight? | Your movie recommender")
+
+# Header image
+st.image("data/cover_collage.jpg")
 
 # Print title and subtitle
 st.title("What should I watch tonight?")
