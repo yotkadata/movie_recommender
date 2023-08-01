@@ -158,39 +158,3 @@ class Recommender:
         titles = movies[movies["movie_id"].isin(movie_ids)]["title"].tolist()
 
         return titles
-
-
-def main() -> None:
-    """
-    Main function.
-    """
-    # movie_id: rating
-    user_query = {
-        10: 4,  # Billy Madison (1995)
-        100: 3,  # Bambi (1942)
-        555: 3.5,  # Mortal Kombat (1995)
-        756: 2,  # Inside Man (2006)
-        1224: 5,  # Babe: Pig in the City (1998)
-    }
-
-    # Recommended movies using Nearest Neighbors
-    recommend = Recommender(user_query, method="neighbors", k=5)
-    _, titles = recommend.recommend()
-
-    print("Recommended movies using Nearest Neighbors:\n")
-    for i, title in enumerate(titles):
-        print(f"{i+1}. {title}")
-
-    print("")
-
-    # Recommended movies using NMF
-    recommend = Recommender(user_query, method="nmf", k=5)
-    _, titles = recommend.recommend()
-
-    print("Recommended movies using NMF:\n")
-    for i, title in enumerate(titles):
-        print(f"{i+1}. {title}")
-
-
-if __name__ == "__main__":
-    main()
