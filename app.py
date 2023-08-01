@@ -1,5 +1,5 @@
 """
-A movie recommender app built with streamlit.
+A movie recommender app built with Streamlit.
 """
 
 import numpy as np
@@ -11,7 +11,7 @@ from recommender import Recommender
 
 
 @st.cache_data
-def load_movies():
+def load_movies() -> pd.DataFrame:
     """
     Function to load prepared data from CSV files.
     """
@@ -20,7 +20,7 @@ def load_movies():
 
 
 @st.cache_data
-def get_random_movies_to_rate(num_movies=5):
+def get_random_movies_to_rate(num_movies: int = 5) -> pd.DataFrame:
     """
     Function to randomly get movie titles and ids to be rated by the user.
     """
@@ -35,7 +35,7 @@ def get_random_movies_to_rate(num_movies=5):
 
 
 @st.cache_data
-def get_movies():
+def get_movies() -> pd.DataFrame:
     """
     Function to get movie titles and ids to be selected by the user.
     """
@@ -46,7 +46,7 @@ def get_movies():
 
 
 @st.cache_data
-def get_movie_id_from_title(title_str):
+def get_movie_id_from_title(title_str: str) -> int:
     """
     Function that returns a movies ID from a title input.
     """
@@ -56,7 +56,7 @@ def get_movie_id_from_title(title_str):
     return int(movies.iloc[0])
 
 
-def prepare_query_favourites():
+def prepare_query_favourites() -> dict:
     """
     Function to prepare query to search for movies based on favourite movies.
     """
@@ -83,7 +83,7 @@ def prepare_query_favourites():
     return query
 
 
-def prepare_query_rating():
+def prepare_query_rating() -> dict:
     """
     Function to prepare query to search for movies based on rating.
     """
@@ -102,7 +102,7 @@ def prepare_query_rating():
     return query
 
 
-def recommender(rec_type="fav"):
+def recommender(rec_type: str = "fav") -> None:
     """
     Function to recommend movies.
     """
@@ -142,7 +142,7 @@ def recommender(rec_type="fav"):
                 display_movie(movie_id)
 
 
-def display_movie(movie_id):
+def display_movie(movie_id: int) -> None:
     """
     Function that displays a movie with information from IMDB.
     """
