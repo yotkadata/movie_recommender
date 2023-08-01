@@ -14,7 +14,7 @@ class Recommender:
     Class to recommend movies based on user ratings input.
     """
 
-    def __init__(self, query, method="neighbors", k=10) -> None:
+    def __init__(self, query: str, method: str = "neighbors", k: int = 10) -> None:
         self.query = query
         self.method = method
         self.k = k
@@ -44,7 +44,7 @@ class Recommender:
 
         return movie_ids, titles
 
-    def recommender_nmf(self, df_query):
+    def recommender_nmf(self, df_query: pd.DataFrame) -> list:
         """
         Filters and recommends the top k movies for any given input query
         based on a trained NMF model.
@@ -71,7 +71,7 @@ class Recommender:
 
         return movie_ids
 
-    def recommender_neighbors(self, df_query):
+    def recommender_neighbors(self, df_query: pd.DataFrame) -> list:
         """
         Filters and recommends the top k movies for any given input query
         based on a trained nearest neighbors model.
@@ -126,7 +126,7 @@ class Recommender:
 
         return movie_ids
 
-    def load_model(self, file_name):
+    def load_model(self, file_name: str) -> object:
         """
         Function to load a model from a pickle file.
         """
@@ -135,7 +135,7 @@ class Recommender:
 
         return model
 
-    def load_prepared_data(self):
+    def load_prepared_data(self) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Function to load prepared data from CSV files.
         """
@@ -143,14 +143,14 @@ class Recommender:
         movies = pd.read_csv("./data/movies_prepared.csv")
         return movies, ratings
 
-    def get_movie_ids(self):
+    def get_movie_ids(self) -> pd.Series:
         """
         Function to get movie ids.
         """
         movies, _ = self.load_prepared_data()
         return movies["movie_id"]
 
-    def get_movie_titles_by_ids(self, movie_ids):
+    def get_movie_titles_by_ids(self, movie_ids: list) -> list:
         """
         Function to get movie ids.
         """
@@ -160,7 +160,7 @@ class Recommender:
         return titles
 
 
-def main():
+def main() -> None:
     """
     Main function.
     """
