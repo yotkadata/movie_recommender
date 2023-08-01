@@ -15,6 +15,8 @@ This App was a weekly project at the SPICED Datascience Bootcamp from April to J
 
 ### Try the App
 
+The app is automatically deployed to render.com using GitHub actions. It runs at https://movie-recommender-tfw7.onrender.com/, but might be slow or sometimes not available.
+
 To use the Streamlit app, clone the repository, install the requirements to your Python environment and run the app:
 
 ```bash
