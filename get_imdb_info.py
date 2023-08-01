@@ -10,7 +10,7 @@ from imdb import Cinemagoer
 from imdb.helpers import resizeImage
 
 
-def load_movies():
+def load_movies() -> pd.DataFrame:
     """
     Function to load prepared data from CSV files.
     """
@@ -18,7 +18,7 @@ def load_movies():
     return movies
 
 
-def fetch_from_imdb(movie_title):
+def fetch_from_imdb(movie_title: str) -> dict:
     """
     Function to fetch information from IMDB
     """
@@ -68,7 +68,7 @@ def fetch_from_imdb(movie_title):
     return False
 
 
-def update_dataframe_row(df_row):
+def update_dataframe_row(df_row: pd.Series) -> pd.Series:
     """
     Function to update a dataframe row with IMDB information.
     """
@@ -81,7 +81,7 @@ def update_dataframe_row(df_row):
     return df_row
 
 
-def combine_batches():
+def combine_batches() -> str:
     """
     Function to combine CSV batches.
     """
@@ -98,13 +98,15 @@ def combine_batches():
     print(f"Batches combined to {concat_file}.")
 
     # Remove batch files
-    [file.unlink() for file in csv_files]
+    for file in csv_files:
+        file.unlink()
+
     print("Batch files removed.")
 
     return concat_file
 
 
-def main():
+def main() -> None:
     """
     Main function
     """
