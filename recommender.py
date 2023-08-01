@@ -14,12 +14,14 @@ class Recommender:
     Class to recommend movies based on user ratings input.
     """
 
-    def __init__(self, query: str, method: str = "neighbors", k: int = 10) -> None:
+    def __init__(
+        self, query: dict[int, float], method: str = "neighbors", k: int = 10
+    ) -> None:
         self.query = query
-        self.method = method
+        self.method = self.validate_method(method)
         self.k = k
 
-    def recommend(self):
+    def recommend(self) -> tuple[list[int], list[str]]:
         """
         Recommends the top k movies for any given input query.
         Returns a list of k movie ids and corresponding movie titles.
@@ -44,7 +46,7 @@ class Recommender:
 
         return movie_ids, titles
 
-    def recommender_nmf(self, df_query: pd.DataFrame) -> list:
+    def recommender_nmf(self, df_query: pd.DataFrame) -> pd.Series:
         """
         Filters and recommends the top k movies for any given input query
         based on a trained NMF model.
@@ -158,3 +160,11 @@ class Recommender:
         titles = movies[movies["movie_id"].isin(movie_ids)]["title"].tolist()
 
         return titles
+
+    def validate_method(self, method: str) -> str:
+        """
+        Function to validate the method.
+        """
+        if method not in ["neighbors", "nmf"]:
+            raise ValueError("Invalid method. Please choose 'neighbors' or 'nmf'.")
+        return method
