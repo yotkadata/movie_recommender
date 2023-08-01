@@ -80,7 +80,7 @@ def build_model_neighbors(metric: str = "cosine", n_jobs: int = -1) -> str:
     return file_name
 
 
-def main():
+def main() -> None:
     """
     Main function
     """
