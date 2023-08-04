@@ -2,14 +2,14 @@
 
 # Movie recommender
 
-### A Streamlit app to recommend movies based on user input
+### A web app to recommend movies based on user input
 
-Uses two different models to determine the recommendations: **Nearest Neighbors** and **Non-negative Matrix Factorization** (can be selected). The models are trained on a reduced data set of movie ratings.
+This recommender system uses two different models to determine the recommendations: **Nearest Neighbors** and **Non-negative Matrix Factorization** (can be selected). The models are trained on a reduced data set of movie ratings.
 
-There are two methods available to get reccomendations:
+There are two methods available to get recommendations:
 
-- **By favourite movies:** Select as many movies you like and get a recommendation for similar movies.
-- **By rating:** Rate up to 10 arbitraily selected movies and get a recommendation based on your rating.
+- **By favorite movies:** Select as many movies you like and get a recommendation for similar movies.
+- **By rating:** Rate up to 10 arbitrarily selected movies and get a recommendation based on your rating.
 
 This App was a weekly project at the SPICED Datascience Bootcamp from April to June 2023.
 
